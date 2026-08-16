@@ -1,4 +1,5 @@
 import { useRef, useState, useEffect, useCallback } from 'react'
+import Toolbar from './Toolbar'
 
 function Canvas() {
   const canvasRef = useRef(null)
@@ -7,10 +8,8 @@ function Canvas() {
   const strokesRef = useRef([])
 
   const [strokes, setStrokes] = useState([])
-
-  useEffect(() => {
-    strokesRef.current = strokes
-  }, [strokes])
+  const [color, setColor] = useState('#000000')
+  const [size, setSize] = useState(3)
 
   const redrawAll = useCallback(() => {
     const canvas = canvasRef.current
@@ -30,6 +29,11 @@ function Canvas() {
       ctx.stroke()
     })
   }, [])
+
+  useEffect(() => {
+    strokesRef.current = strokes
+    redrawAll()
+  }, [strokes, redrawAll])
 
   const resizeCanvas = useCallback(() => {
     const canvas = canvasRef.current
@@ -57,8 +61,8 @@ function Canvas() {
     const point = getPoint(e)
     currentStrokeRef.current = {
       id: crypto.randomUUID(),
-      color: '#000000',
-      size: 3,
+      color,
+      size,
       points: [point],
     }
   }
@@ -88,15 +92,34 @@ function Canvas() {
     currentStrokeRef.current = null
   }
 
+  const handleUndo = () => {
+    setStrokes((prev) => prev.slice(0, -1))
+  }
+
+  const handleClear = () => {
+    setStrokes([])
+  }
+
   return (
-    <canvas
-      ref={canvasRef}
-      className="fixed inset-0 touch-none bg-white"
-      onPointerDown={handlePointerDown}
-      onPointerMove={handlePointerMove}
-      onPointerUp={handlePointerUp}
-      onPointerLeave={handlePointerUp}
-    />
+    <>
+      <canvas
+        ref={canvasRef}
+        className="fixed inset-0 touch-none bg-white"
+        onPointerDown={handlePointerDown}
+        onPointerMove={handlePointerMove}
+        onPointerUp={handlePointerUp}
+        onPointerLeave={handlePointerUp}
+      />
+      <Toolbar
+        color={color}
+        onColorChange={setColor}
+        size={size}
+        onSizeChange={setSize}
+        onUndo={handleUndo}
+        onClear={handleClear}
+        canUndo={strokes.length > 0}
+      />
+    </>
   )
 }
 

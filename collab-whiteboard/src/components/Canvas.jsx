@@ -1,4 +1,5 @@
 import { useRef, useState, useEffect, useCallback } from 'react'
+import { useStorage, useMutation } from '@liveblocks/react/suspense'
 import Toolbar from './Toolbar'
 
 function Canvas() {
@@ -7,9 +8,22 @@ function Canvas() {
   const currentStrokeRef = useRef(null)
   const strokesRef = useRef([])
 
-  const [strokes, setStrokes] = useState([])
+  const strokes = useStorage((root) => root.strokes)
   const [color, setColor] = useState('#000000')
   const [size, setSize] = useState(3)
+
+  const addStroke = useMutation(({ storage }, stroke) => {
+    storage.get('strokes').push(stroke)
+  }, [])
+
+  const undoStroke = useMutation(({ storage }) => {
+    const list = storage.get('strokes')
+    if (list.length > 0) list.delete(list.length - 1)
+  }, [])
+
+  const clearStrokes = useMutation(({ storage }) => {
+    storage.get('strokes').clear()
+  }, [])
 
   const redrawAll = useCallback(() => {
     const canvas = canvasRef.current
@@ -88,16 +102,16 @@ function Canvas() {
   const handlePointerUp = () => {
     if (!isDrawingRef.current) return
     isDrawingRef.current = false
-    setStrokes((prev) => [...prev, currentStrokeRef.current])
+    addStroke(currentStrokeRef.current)
     currentStrokeRef.current = null
   }
 
   const handleUndo = () => {
-    setStrokes((prev) => prev.slice(0, -1))
+    undoStroke()
   }
 
   const handleClear = () => {
-    setStrokes([])
+    clearStrokes()
   }
 
   return (

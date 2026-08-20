@@ -7,6 +7,7 @@ function Canvas() {
   const isDrawingRef = useRef(false)
   const currentStrokeRef = useRef(null)
   const strokesRef = useRef([])
+  const lastSizeRef = useRef({ width: 0, height: 0 })
 
   const strokes = useStorage((root) => root.strokes)
   const [color, setColor] = useState('#000000')
@@ -28,8 +29,7 @@ function Canvas() {
   const redrawAll = useCallback(() => {
     const canvas = canvasRef.current
     const ctx = canvas.getContext('2d')
-    const rect = canvas.getBoundingClientRect()
-    ctx.clearRect(0, 0, rect.width, rect.height)
+    ctx.clearRect(0, 0, window.innerWidth, window.innerHeight)
 
     strokesRef.current.forEach((stroke) => {
       if (stroke.points.length < 2) return
@@ -50,11 +50,18 @@ function Canvas() {
   }, [strokes, redrawAll])
 
   const resizeCanvas = useCallback(() => {
+    const width = window.innerWidth
+    const height = window.innerHeight
+
+    if (lastSizeRef.current.width === width && lastSizeRef.current.height === height) {
+      return
+    }
+    lastSizeRef.current = { width, height }
+
     const canvas = canvasRef.current
     const dpr = window.devicePixelRatio || 1
-    const rect = canvas.getBoundingClientRect()
-    canvas.width = rect.width * dpr
-    canvas.height = rect.height * dpr
+    canvas.width = width * dpr
+    canvas.height = height * dpr
     canvas.getContext('2d').scale(dpr, dpr)
     redrawAll()
   }, [redrawAll])
@@ -65,10 +72,7 @@ function Canvas() {
     return () => window.removeEventListener('resize', resizeCanvas)
   }, [resizeCanvas])
 
-  const getPoint = (e) => {
-    const rect = canvasRef.current.getBoundingClientRect()
-    return { x: e.clientX - rect.left, y: e.clientY - rect.top }
-  }
+  const getPoint = (e) => ({ x: e.clientX, y: e.clientY })
 
   const handlePointerDown = (e) => {
     isDrawingRef.current = true
@@ -118,7 +122,7 @@ function Canvas() {
     <>
       <canvas
         ref={canvasRef}
-        className="fixed inset-0 touch-none bg-white"
+        className="fixed inset-0 w-screen h-screen touch-none bg-white"
         onPointerDown={handlePointerDown}
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerUp}

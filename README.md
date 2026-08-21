@@ -2,7 +2,7 @@
 
 A real-time collaborative whiteboard — draw together with anyone, live, in the browser.
 
-**Live demo:** [https://collab-whiteboard-one.vercel.app](https://collab-whiteboard-pink.vercel.app/)
+**Live demo:** [https://collab-whiteboard-pink.vercel.app](https://collab-whiteboard-pink.vercel.app/)
 
 ## Features
 
@@ -44,7 +44,8 @@ npm install
 You'll need a free [Liveblocks](https://liveblocks.io) account — create a project, grab your public API key from the API keys tab, and add it to a `.env.local` file in the project root:
 
 ```
-VITE_LIVEBLOCKS_PUBLIC_KEY=pk_your_key_here
+VITE_LIVEBLOCKS_PUBLIC_KEY=pk_dev_JP1KUOVPgHPr7jCrUFV9HveI_pUnhoDrnZ44yoepk4x1xcjzemBqOLGbpVxHGl4x
+
 ```
 
 Start the dev server:

@@ -44,7 +44,7 @@ npm install
 You'll need a free [Liveblocks](https://liveblocks.io) account — create a project, grab your public API key from the API keys tab, and add it to a `.env.local` file in the project root:
 
 ```
-VITE_LIVEBLOCKS_PUBLIC_KEY=pk_dev_JP1KUOVPgHPr7jCrUFV9HveI_pUnhoDrnZ44yoepk4x1xcjzemBqOLGbpVxHGl4x
+VITE_LIVEBLOCKS_PUBLIC_KEY=your key
 
 ```
 
